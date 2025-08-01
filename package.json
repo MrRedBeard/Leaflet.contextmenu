@@ -1,35 +1,60 @@
 {
   "name": "leaflet-contextmenu",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "A context menu for Leaflet",
-  "main": "dist/leaflet.contextmenu.js",
-  "directories": {
-    "example": "examples"
-  },
   "scripts": {
-    "concat": "cat src/copyright.js src/Map.ContextMenu.js src/Mixin.ContextMenu.js src/end.js > dist/leaflet.contextmenu.js",
-    "compress": "node_modules/uglify-js/bin/uglifyjs dist/leaflet.contextmenu.js -m --comments -o dist/leaflet.contextmenu.min.js; node_modules/uglifycss/uglifycss dist/leaflet.contextmenu.css > dist/leaflet.contextmenu.min.css",
-    "build": "npm run concat && npm run compress"
+    "build": "npm run build:iife && npm run build:esm && npm run build:umd",
+    "build:iife": "rollup -c rollup.config.iife.js",
+    "build:esm": "rollup -c rollup.config.esm.js",
+    "build:umd": "rollup -c rollup.config.umd.js"
   },
+  "type": "module",
+  "main": "./dist/leaflet.contextmenu.umd.js",
+  "module": "./dist/leaflet.contextmenu.esm.js",
+  "style": "dist/leaflet.contextmenu.css",
+  "exports": {
+    "import": "./dist/leaflet.contextmenu.esm.js",
+    "require": "./dist/leaflet.contextmenu.umd.js"
+  },
+  "directories": {
+    "dist": "dist",
+    "images": "images",
+    "src": "src"
+  },
+  "file": "dist/leaflet.contextmenu.iife.js",
+  "files": [
+    "dist/",
+    "leaflet.contextmenu.js",
+    "index.html"
+  ],
+  "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/aratcliffe/Leaflet.contextmenu.git"
+    "url": "https://github.com/MrRedBeard/Leaflet.contextmenu.git"
   },
   "keywords": [
     "leaflet",
     "contextmenu",
-    "mixin",
     "context",
-    "menu"
+    "menu",
+    "submenu"
   ],
-  "author": "Adam Ratcliffe",
+  "author": "MrRedBeard and Adam Ratcliffe",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/aratcliffe/Leaflet.contextmenu/issues"
+    "url": "https://github.com/MrRedBeard/Leaflet.contextmenu/issues"
   },
-  "homepage": "https://github.com/aratcliffe/Leaflet.contextmenu",
+  "homepage": "https://github.com/MrRedBeard/Leaflet.contextmenu/issues",
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  },
   "devDependencies": {
-    "uglify-js": "^2.7.4",
-    "uglifycss": "^0.0.25"
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "@rollup/plugin-alias": "^5.1.1",
+    "vite": "^7.0.4"
   }
 }

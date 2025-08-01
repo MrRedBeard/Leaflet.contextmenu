@@ -1,4 +1,12 @@
 # Leaflet.contextmenu
+
+Adding support for submenus 
+
+Rebuilding the build system
+
+
+---
+
 [![CDNJS](https://img.shields.io/cdnjs/v/leaflet-contextmenu.svg)](https://cdnjs.com/libraries/leaflet-contextmenu)
 [![npm](https://img.shields.io/npm/v/leaflet-contextmenu.svg)](https://www.npmjs.com/package/leaflet-contextmenu)
 [![Bower](https://img.shields.io/bower/v/leaflet.contextmenu.svg)](https://libraries.io/bower/Leaflet.contextmenu)

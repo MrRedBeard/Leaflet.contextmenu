@@ -3,12 +3,12 @@
   <head>
     <title>Leaflet Context Menu</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css"/>
-    <link rel="stylesheet" href="../dist/leaflet.contextmenu.css"/>
+    <link rel="stylesheet" href="./dist/leaflet.contextmenu.css"/>
   </head>
   <body>
     <div id="map" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
     <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
-    <script src="../dist/leaflet.contextmenu.js"></script>
+    <script src="./dist/leaflet.contextmenu.iife.js"></script>
     <script>
       var map,
           cm,
@@ -31,26 +31,42 @@
 	      map.zoomOut();
       }
 
+      L.Map.addInitHook('addHandler', 'contextmenu', LeafletContextMenu);
+
       map = L.map('map', {
 	      center: ll,
 	      zoom: 15,
 	      contextmenu: true,
       contextmenuWidth: 140,
-	      contextmenuItems: [{
-		      text: 'Show coordinates',
-		      callback: showCoordinates
-	      }, {
-		      text: 'Center map here',
-		      callback: centerMap
-	      }, '-', {
-		      text: 'Zoom in',
-		      icon: 'images/zoom-in.png',
-		      callback: zoomIn
-	      }, {
-		      text: 'Zoom out',
-		      icon: 'images/zoom-out.png',
-		      callback: zoomOut
-	  }]
+	      contextmenuItems: [
+            {
+              text: 'Show coordinates',
+              callback: showCoordinates
+            }, 
+            {
+              text: 'Center map here',
+              callback: centerMap
+            },
+            '-',
+            {
+              text: 'Connections',
+              submenu: [
+                { text: 'Add Connection', callback: () => console.log('Add') },
+                { text: 'Remove Connection', callback: () => console.log('Remove') }
+              ]
+            }, 
+            '-',
+            {
+              text: 'Zoom in',
+              icon: 'images/zoom-in.png',
+              callback: zoomIn
+            },
+            {
+              text: 'Zoom out',
+              icon: 'images/zoom-out.png',
+              callback: zoomOut
+            }
+          ]
       });
 
 	  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
