@@ -69,7 +69,9 @@ L.map('map', {
 ### As a module
 ```JS
 import L from 'leaflet';
-import LeafletContextMenu from './LeafletContextMenu.js';
+// import LeafletContextMenu from './LeafletContextMenu.js';
+import 'leaflet-contextmenu';
+import 'leaflet-contextmenu/dist/leaflet.contextmenu.css';
 L.Map.addInitHook('addHandler', 'contextmenu', LeafletContextMenu);
 ```
 
