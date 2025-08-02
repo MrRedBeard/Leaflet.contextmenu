@@ -14,7 +14,8 @@
   "style": "./dist/leaflet.contextmenu.css",
   "exports": {
     "import": "./dist/leaflet.contextmenu.esm.js",
-    "require": "./dist/leaflet.contextmenu.umd.js"
+    "require": "./dist/leaflet.contextmenu.umd.js",
+    "./dist/leaflet.contextmenu.css": "./dist/leaflet.contextmenu.css"
   },
   "directories": {
     "dist": "dist",
@@ -24,6 +25,7 @@
   "file": "dist/leaflet.contextmenu.iife.js",
   "files": [
     "dist/",
+    "dist/leaflet.contextmenu.css",
     "leaflet.contextmenu.js",
     "index.html"
   ],
