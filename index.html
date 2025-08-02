@@ -4,6 +4,9 @@
     <title>Leaflet Context Menu</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css"/>
     <link rel="stylesheet" href="./dist/leaflet.contextmenu.css"/>
+
+    <script src="./fonts/kfi.js"></script>
+    <link rel="stylesheet" href="./fonts/kfi.css"/>
   </head>
   <body>
     <div id="map" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
@@ -11,9 +14,7 @@
     <script src="./dist/leaflet.contextmenu.iife.js"></script>
     <script>
       var map,
-          cm,
-          ll = new L.LatLng(-36.852668, 174.762675),
-          ll2 = new L.LatLng(-36.86, 174.77);
+          cm;
 
       function showCoordinates (e) {
 	      alert(e.latlng);
@@ -34,10 +35,9 @@
       L.Map.addInitHook('addHandler', 'contextmenu', LeafletContextMenu);
 
       map = L.map('map', {
-	      center: ll,
+	      center: new L.LatLng(-36.852668, 174.762675),
 	      zoom: 15,
 	      contextmenu: true,
-      contextmenuWidth: 140,
 	      contextmenuItems: [
             {
               text: 'Show coordinates',
@@ -45,14 +45,15 @@
             }, 
             {
               text: 'Center map here',
+              iconCls: 'kfi-map-fuel',
               callback: centerMap
             },
             '-',
             {
               text: 'Connections',
               submenu: [
-                { text: 'Add Connection', callback: () => console.log('Add') },
-                { text: 'Remove Connection', callback: () => console.log('Remove') }
+                { text: 'Add Connection', iconCls: 'kfi-magnify-alt', callback: () => console.log('Add') },
+                { text: 'Remove Connection', iconCls: 'kfi-math-plus', callback: () => console.log('Remove') }
               ]
             }, 
             '-',
@@ -73,24 +74,28 @@
 		  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 	  }).addTo(map);
 
-      L.marker(ll, {
-          contextmenu: true,
-          contextmenuItems: [{
-              text: 'Marker item',
-              index: 0
-          }, {
-              separator: true,
-              index: 1
-          }]
-      }).addTo(map);
 
-      L.marker(ll2, {
-          contextmenu: true,
-          contextmenuInheritItems: false,
-          contextmenuItems: [{
-              text: 'Marker item'
-          }]
-      }).addTo(map);
+    const marker1 = L.marker(new L.LatLng(-36.852668, 174.762675)).addTo(map);
+
+    map.contextmenu.bindContextMenuToLayer(marker1, [
+      {
+          separator: true
+      },
+      {
+          text: 'Marker item',
+          callback: (e) => alert('Marker 1 right-clicked')
+      }
+    ], { inherit: true });
+
+    const marker2 = L.marker(new L.LatLng(-36.86, 174.77)).addTo(map);
+
+    map.contextmenu.bindContextMenuToLayer(marker2, [
+      {
+          text: 'Zoom out',
+          icon: 'images/zoom-out.png',
+          callback: zoomOut
+      }
+    ], { inherit: false });
 
     </script>
   </body>

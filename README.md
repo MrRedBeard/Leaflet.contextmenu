@@ -1,76 +1,116 @@
 # Leaflet.contextmenu
 
-Adding support for submenus 
+LeafletContextMenu - Modern ES class-based context menu for Leaflet
 
-Rebuilding the build system
+* Added support for submenus 
+* Rebuilt the build system using Vite and Rollup
+* Refactored overall code
+* Added additional support for font based icons with emphasis on [https://github.com/Kitchen-JS/KitchenJSFontIcons](https://github.com/Kitchen-JS/KitchenJSFontIcons)
+* Removed support for ie
+
+## Support
+| Leaflet Version             | Status              | Notes                                                                  |
+| --------------------------- | ------------------- | ---------------------------------------------------------------------- |
+| **1.0.0 – 1.9.x**           | Fully supported   | Tested and stable                                                      |
+| **1.9.x** 				  | Fully supported   | No breaking API changes                                                |
+| **2.0+  (future)**          | Probable support | //Review: Replace usage of L with explicit imports from the Leaflet package: import { Marker } from 'leaflet' and To have global access to variables of a module-script, assign them to the window object (Not recommended) https://github.com/Leaflet/Leaflet/blob/main/CHANGELOG.md  |
+
+## ToDo
+* option disabled needs to be revisited
+
+## Usage
+
+The context menu is implemented as a map interaction handler.  To use the plugin include the script and enable using the map `contextmenu` option.
+
+```JavaScript
+L.map('map', {
+    contextmenu: true,
+    contextmenuItems: [
+        {
+            text: 'Show Coordinates',
+            callback: showCoordinates
+        },
+        {
+            text: 'Center Map Here',
+            iconCls: 'kfi-map-fuel',
+            callback: centerMap
+        },
+        '-', // Spacer here
+        {
+            text: 'Connections',
+            submenu: [
+                {
+                    text: 'Add Connection',
+                    iconCls: 'kfi-magnify-alt',
+                    callback: () => console.log('Add')
+                },
+                {
+                    text: 'Remove Connection',
+                    iconCls: 'kfi-math-plus',
+                    callback: () => console.log('Remove')
+                }
+            ]
+        },
+        '-', // Another Spacer
+        {
+            text: 'Zoom In',
+            icon: 'images/zoom-in.png',
+            callback: zoomIn
+        },
+        {
+            text: 'Zoom Out',
+            icon: 'images/zoom-out.png',
+            callback: zoomOut
+        }
+    ]
+});
+```
+
+### As a module
+```JS
+import L from 'leaflet';
+import LeafletContextMenu from './LeafletContextMenu.js';
+L.Map.addInitHook('addHandler', 'contextmenu', LeafletContextMenu);
+```
+
+### Shape Specific Contextmenu
+```JavaScript
+const marker1 = L.marker(new L.LatLng(-36.852668, 174.762675)).addTo(map);
+
+map.contextmenu.bindContextMenuToLayer(marker1, [
+	{
+      separator: true
+	},
+	{
+		text: 'Marker item',
+		callback: (e) => alert('Marker 1 right-clicked')
+	}
+], { inherit: true });
+
+const marker2 = L.marker(new L.LatLng(-36.86, 174.77)).addTo(map);
+
+map.contextmenu.bindContextMenuToLayer(marker2, [
+	{
+		text: 'Zoom out',
+		icon: 'images/zoom-out.png',
+		callback: zoomOut
+	}
+], { inherit: false });
+```
+
+### Separators
+```JavaScript
+{
+	separator: true
+}
+```
+or
+```JavaScript
+'-'
+```
 
 
 ---
-
-[![CDNJS](https://img.shields.io/cdnjs/v/leaflet-contextmenu.svg)](https://cdnjs.com/libraries/leaflet-contextmenu)
-[![npm](https://img.shields.io/npm/v/leaflet-contextmenu.svg)](https://www.npmjs.com/package/leaflet-contextmenu)
-[![Bower](https://img.shields.io/bower/v/leaflet.contextmenu.svg)](https://libraries.io/bower/Leaflet.contextmenu)
-
-A context menu for Leaflet. See the [demo](http://aratcliffe.github.io/Leaflet.contextmenu/examples/index.html).
-
-Now supporting Leaflet 1.0
-
-## Usage
-The context menu is implemented as a map interaction handler.  To use the plugin include the script and enable using the map `contextmenu` option.
-
-````javascript
-var map = L.map('map', {
-	contextmenu: true,
-    contextmenuWidth: 140,
-	contextmenuItems: [{
-	    text: 'Show coordinates',
-	    callback: showCoordinates
-	}, {
-	    text: 'Center map here',
-	    callback: centerMap
-	}, '-', {
-	    text: 'Zoom in',
-	    icon: 'images/zoom-in.png',
-	    callback: zoomIn
-	}, {
-	    text: 'Zoom out',
-	    icon: 'images/zoom-out.png',
-	    callback: zoomOut
-	}]
-});
-
-
-function showCoordinates (e) {
-	alert(e.latlng);
-}
-
-function centerMap (e) {
-	map.panTo(e.latlng);
-}
-
-function zoomIn (e) {
-	map.zoomIn();
-}
-
-function zoomOut (e) {
-	map.zoomOut();
-}
-````
-
-The context menu mixin allows markers and vector features to extend the map context menu with their own menu items. In addition to the menu item options available for the map context menu marker's also accept an `index` option that specifies where the menu item should be inserted relative to the existing map menu items.
-
-````javascript
-L.marker(ll, {
-    contextmenu: true,
-    contextmenuItems: [{
-        text: 'Marker item',
-        index: 0
-    }, {
-        separator: true,
-        index: 1
-    }]
-}).addTo(map);
-````
 
 ### All Options
 #### Map Context Menu Options
@@ -78,8 +118,6 @@ L.marker(ll, {
 | Option | Type | Default | Description
 | --- | --- | --- | ---
 | contextmenu | Bool | `false` | Enables the context menu.
-| contextmenuWidth | Number | `undefined` | If defined sets the context menu width, if `undefined` the menu will be sized by the maximum width of its menu items.
-| contextmenuAnchor | L.Point/Array | `undefined` | An offset applied to the click point to control the context menu position.
 | contextmenuItems | Array | `[]` | Specification for the context menu items. See following options for individual menu items. A separator may also be added with a dash character `'-'`.
 
 #### Menu Item Options
@@ -95,16 +133,6 @@ L.marker(ll, {
 | context | Object | The map | The scope the callback will be executed in.
 | disabled | Bool | `false` | If `true` the menu item will initially be in a disabled state and will not respond to click events.
 | separator | Bool | `undefined` | If `true` a separator will be created instead of a menu item.
-| hideOnSelect | Bool | `true` | If `true` the context menu will be automatically hidden when a menu item is selected
-
-#### Mixin Options
-
-| Option | Type | Default | Description
-| --- | --- | --- | ---
-| contextmenu | Bool | `false` | Enables the context menu.
-| contextmenuItems | Array | `[]` | Specification for the context menu items.
-| contextmenuInheritItems | Bool | `true` | If `true` (the default) the feature menu items are displayed in addition to the map's context menu items.
-
 
 ### Methods
 
@@ -274,5 +302,12 @@ npm install
 npm run build
 ````
 
+## Credit
+[https://github.com/aratcliffe/Leaflet.contextmenu](https://github.com/aratcliffe/Leaflet.contextmenu)
+
 ## License
-This software is released under the [MIT licence](http://www.opensource.org/licenses/mit-license.php). Icons used in the example are from [http://glyphicons.com](http://glyphicons.com).
+This software is released under the [MIT licence](https://opensource.org/license/mit). 
+
+Font Based Icons are from [https://github.com/Kitchen-JS/KitchenJSFontIcons/tree/main](https://github.com/Kitchen-JS/KitchenJSFontIcons/tree/main)
+
+Icons used in the example are from [https://glyphicons.com/](https://glyphicons.com/).

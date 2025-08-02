@@ -4,6 +4,7 @@ import json from '@rollup/plugin-json';
 import polyfills from 'rollup-plugin-node-polyfills';
 import alias from '@rollup/plugin-alias';
 import postcss from 'rollup-plugin-postcss';
+import postcssBanner from 'postcss-banner';
 import pkg from './package.json' assert { type: 'json' };
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -45,6 +46,12 @@ export default
       json(),
       polyfills(),
       postcss({
+        plugins: [
+          postcssBanner({
+            banner: `LeafletContextMenu v${pkg.version}`,
+            inline: false
+          })
+        ],
         extract: path.resolve(__dirname, 'dist/leaflet.contextmenu.css'),
         minimize: false,
         sourceMap: false

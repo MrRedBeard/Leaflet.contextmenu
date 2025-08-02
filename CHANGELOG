@@ -1,0 +1,10 @@
+# 1.6.0 (2025-08-02)
+* Added support for submenus 
+* Rebuilt the build system using Vite and Rollup
+* Refactored overall code
+* Added additional support for font based icons with emphasis on [https://github.com/Kitchen-JS/KitchenJSFontIcons](https://github.com/Kitchen-JS/KitchenJSFontIcons)
+* Removed support for ie
+* Removed option contextmenuWidth width is dynamic with hard limits set
+* Removed option contextmenuAnchor - see _setPosition method
+* Removed option hideOnSelect does this by default
+* Removed mixins

@@ -1,6 +1,5 @@
 /**
  * LeafletContextMenu - Modern ES class-based context menu for Leaflet
- * Leaflet.contextmenu, a context menu for Leaflet.
  * (c) 2015, Adam Ratcliffe, GeoSmart Maps Limited
  * @author MrRedBeard, Adam Ratcliffe
  * @license MIT
@@ -63,6 +62,7 @@ export default class LeafletContextMenu extends L.Handler
     insertItem(options, index = this._items.length)
     {
         const item = this._createItem(this._container, options, index);
+        item.container = this._container;
         this._items.push(item);
         this._sizeChanged = true;
         return item.el;
@@ -71,15 +71,21 @@ export default class LeafletContextMenu extends L.Handler
     removeItem(indexOrEl)
     {
         const el = typeof indexOrEl === 'number' ? this._container.children[indexOrEl] : indexOrEl;
-        if (el)
+        if (!el) return;
+
+        const id = L.Util.stamp(el);
+        const idx = this._items.findIndex(item => item.id === id);
+        if (idx !== -1)
         {
-            const id = L.Util.stamp(el);
-            const idx = this._items.findIndex(item => item.id === id);
-            if (idx !== -1)
+            const item = this._items[idx];
+
+            // Confirm the element is in the tracked container
+            if (item.container && item.container.contains(item.el))
             {
-                this._container.removeChild(this._items[idx].el);
-                this._items.splice(idx, 1);
+                item.container.removeChild(item.el);
             }
+
+            this._items.splice(idx, 1);
         }
     }
 
@@ -89,6 +95,15 @@ export default class LeafletContextMenu extends L.Handler
         {
             this.removeItem(this._items[0].el);
         }
+    }
+
+    restoreDefaultItems()
+    {
+        this._items
+            .filter(item => !item.isDefault)
+            .forEach(item => this.removeItem(item.el));
+
+        this.showAllItems();
     }
 
     hideAllItems()
@@ -167,15 +182,15 @@ export default class LeafletContextMenu extends L.Handler
         const items = this._map.options.contextmenuItems || [];
         items.forEach(item =>
         {
-            this._items.push(this._createItem(this._container, item));
+            this._items.push({ ...this._createItem(this._container, item), isDefault: true });
         });
     }
 
     _createItem(container, options, index)
     {
-        if (Array.isArray(options.submenu))
+        if (typeof options === 'string' && options === '-')
         {
-            return this._createSubmenu(container, options, index);
+            return this._createSeparator(container, index);
         }
 
         if (options.separator)
@@ -183,8 +198,19 @@ export default class LeafletContextMenu extends L.Handler
             return this._createSeparator(container, index);
         }
 
+        if (Array.isArray(options.submenu))
+        {
+            return this._createSubmenu(container, options, index);
+        }
+
         const el = this._insertElementAt('a', `${LeafletContextMenu.BASE_CLS}-item`, container, index);
-        el.innerHTML = `${options.icon ? `<img src="${options.icon}" class='${LeafletContextMenu.BASE_CLS}-icon'/>` : ''}${options.text}`;
+        const iconHTML = options.icon
+            ? `<img src="${options.icon}" class="${LeafletContextMenu.BASE_CLS}-icon" />`
+            : options.iconCls
+            ? `<i class="${LeafletContextMenu.BASE_CLS}-icon ${options.iconCls}"></i>`
+            : '';
+
+        el.innerHTML = `${iconHTML}${options.text}`;
         el.href = '#';
 
         const callback = this._createEventHandler(el, options.callback, options.context);
@@ -193,13 +219,13 @@ export default class LeafletContextMenu extends L.Handler
         return {
             id: L.Util.stamp(el),
             el,
-            callback
+            callback,
+            container
         };
     }
 
     _createSubmenu(container, options, index)
     {
-        //const wrapper = this._insertElementAt('div', `${LeafletContextMenu.BASE_CLS}-item`, container, index);
         const wrapper = this._insertElementAt('div', `${LeafletContextMenu.BASE_CLS}-item has-submenu`, container, index);
         wrapper.textContent = options.text;
 
@@ -209,7 +235,7 @@ export default class LeafletContextMenu extends L.Handler
         options.submenu.forEach(subOpt =>
         {
             const subItem = this._createItem(submenuEl, subOpt);
-            this._items.push(subItem); // track
+            subItem.container = submenuEl;
         });
 
         wrapper.appendChild(submenuEl);
@@ -217,7 +243,8 @@ export default class LeafletContextMenu extends L.Handler
         return {
             id: L.Util.stamp(wrapper),
             el: wrapper,
-            submenu: submenuEl
+            submenu: submenuEl,
+            container
         };
     }
 
@@ -301,6 +328,17 @@ export default class LeafletContextMenu extends L.Handler
         {
             this._container.style.display = 'none';
             this._visible = false;
+
+            // Clean up non-default items
+            this._items
+                .filter(item => !item.isDefault)
+                .forEach(item => this.removeItem(item.el));
+
+            // Restore default items if they were hidden
+            this.showAllItems();
+
+            // Optional: trigger custom event for hooks
+            this._map.fire('contextmenu.hide');
         }        
     }
 
@@ -335,13 +373,18 @@ export default class LeafletContextMenu extends L.Handler
             const map = layer._map;
             if (!map.contextmenu) return;
 
+            map.contextmenu._items
+                .filter(item => !item.isDefault)
+                .forEach(item => map.contextmenu.removeItem(item.el));
+
+            // If not inheriting, hide all default items
             if (!inherit) map.contextmenu.hideAllItems();
 
-            const inserted = items.map(opt => map.contextmenu.insertItem(opt));
-            map.once('contextmenu.hide', () =>
+            items.forEach(opt =>
             {
-                inserted.forEach(el => map.contextmenu.removeItem(el));
-                if (!inherit) map.contextmenu.showAllItems();
+                const item = map.contextmenu.insertItem(opt);
+                item.isDefault = false;
+                item.container = map.contextmenu._container;
             });
 
             const point = map.mouseEventToContainerPoint(e.originalEvent);
