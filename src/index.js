@@ -1,4 +1,7 @@
 import './leaflet.contextmenu.css';
-export { default } from './leaflet.contextmenu.js';
+import LeafletContextMenu from './leaflet.contextmenu.js';
 
+L.ContextMenu = LeafletContextMenu;
 window.LeafletContextMenu = LeafletContextMenu;
+
+export default LeafletContextMenu;

@@ -3,7 +3,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('leaflet')) :
     typeof define === 'function' && define.amd ? define(['leaflet'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LeafletContextMenu = factory(global.L));
-})(this, (function (L) { 'use strict';
+})(this, (function (L$1) { 'use strict';
 
     /**
      * LeafletContextMenu - Modern ES class-based context menu for Leaflet
@@ -13,7 +13,7 @@
      */
 
 
-    let LeafletContextMenu$1 = class LeafletContextMenu extends L.Handler
+    class LeafletContextMenu extends L$1.Handler
     {
 
         static BASE_CLS = 'leaflet-contextmenu';
@@ -31,10 +31,10 @@
         {
             const container = this._map.getContainer();
             //container.addEventListener('mouseleave', this._hide);
-            L.DomEvent.on(container, 'mouseleave', () => this._hide());
+            L$1.DomEvent.on(container, 'mouseleave', () => this._hide());
             
             //document.addEventListener('keydown', this._onKeyDown);
-            L.DomEvent.on(container, 'keydown', () => this._onKeyDown);
+            L$1.DomEvent.on(container, 'keydown', () => this._onKeyDown);
 
             this._map.on('contextmenu', this._show, this);
             this._map.on('mousedown zoomstart', this._hide, this);
@@ -51,7 +51,7 @@
 
         showAt(latlng, data = {})
         {
-            const point = latlng instanceof L.LatLng ? this._map.latLngToContainerPoint(latlng) : latlng;
+            const point = latlng instanceof L$1.LatLng ? this._map.latLngToContainerPoint(latlng) : latlng;
             this._showAtPoint(point, data);
         }
 
@@ -79,7 +79,7 @@
             const el = typeof indexOrEl === 'number' ? this._container.children[indexOrEl] : indexOrEl;
             if (!el) return;
 
-            const id = L.Util.stamp(el);
+            const id = L$1.Util.stamp(el);
             const idx = this._items.findIndex(item => item.id === id);
             if (idx !== -1)
             {
@@ -137,18 +137,18 @@
         setDisabled(item, disabled)
         {
             var container = this._container,
-            itemCls = L.Map.ContextMenu.BASE_CLS + '-item';
+            itemCls = L$1.Map.ContextMenu.BASE_CLS + '-item';
 
             if (!isNaN(item))
             {
                 item = container.children[item];
             }
 
-            if (item && L.DomUtil.hasClass(item, itemCls))
+            if (item && L$1.DomUtil.hasClass(item, itemCls))
             {
                 if (disabled)
                 {
-                    L.DomUtil.addClass(item, itemCls + '-disabled');
+                    L$1.DomUtil.addClass(item, itemCls + '-disabled');
                     this._map.fire('contextmenu.disableitem', 
                     {
                         contextmenu: this,
@@ -157,7 +157,7 @@
                 }
                 else 
                 {
-                    L.DomUtil.removeClass(item, itemCls + '-disabled');
+                    L$1.DomUtil.removeClass(item, itemCls + '-disabled');
                     this._map.fire('contextmenu.enableitem',
                     {
                         contextmenu: this,
@@ -174,12 +174,12 @@
 
         _createContainer(map)
         {
-            const container = L.DomUtil.create('div', LeafletContextMenu.BASE_CLS, map._container);
+            const container = L$1.DomUtil.create('div', LeafletContextMenu.BASE_CLS, map._container);
             container.style.zIndex = 10000;
             container.style.position = 'absolute';
             container.style.display = 'none';
-            container.addEventListener('click', L.DomEvent.stop);
-            container.addEventListener('contextmenu', L.DomEvent.stop);
+            container.addEventListener('click', L$1.DomEvent.stop);
+            container.addEventListener('contextmenu', L$1.DomEvent.stop);
             return container;
         }
 
@@ -223,7 +223,7 @@
             el.addEventListener('click', callback);
 
             return {
-                id: L.Util.stamp(el),
+                id: L$1.Util.stamp(el),
                 el,
                 callback,
                 container
@@ -247,7 +247,7 @@
             wrapper.appendChild(submenuEl);
 
             return {
-                id: L.Util.stamp(wrapper),
+                id: L$1.Util.stamp(wrapper),
                 el: wrapper,
                 submenu: submenuEl,
                 container
@@ -256,18 +256,18 @@
 
         _getIcon(options)
         {
-            return L.Browser.retina && options.retinaIcon || options.icon;
+            return L$1.Browser.retina && options.retinaIcon || options.icon;
         }
 
         _getIconCls(options)
         {
-            return L.Browser.retina && options.retinaIconCls || options.iconCls;
+            return L$1.Browser.retina && options.retinaIconCls || options.iconCls;
         }
 
         _createSeparator(container, index)
         {
             const el = this._insertElementAt('div', `${LeafletContextMenu.BASE_CLS}-separator`, container, index);
-            return { id: L.Util.stamp(el), el };
+            return { id: L$1.Util.stamp(el), el };
         }
 
         _insertElementAt(tag, className, container, index)
@@ -364,12 +364,12 @@
 
         _onItemMouseOver(e)
         {
-            L.DomUtil.addClass(e.target || e.srcElement, 'over');
+            L$1.DomUtil.addClass(e.target || e.srcElement, 'over');
         }
 
         _onItemMouseOut(e)
         {
-            L.DomUtil.removeClass(e.target || e.srcElement, 'over');
+            L$1.DomUtil.removeClass(e.target || e.srcElement, 'over');
         }
 
         bindContextMenuToLayer(layer, items, { inherit = true } = {})
@@ -402,11 +402,12 @@
         {
             layer.off('contextmenu');
         }
-    };
+    }
 
+    L.ContextMenu = LeafletContextMenu;
     window.LeafletContextMenu = LeafletContextMenu;
 
-    return LeafletContextMenu$1;
+    return LeafletContextMenu;
 
 }));
 //# sourceMappingURL=leaflet.contextmenu.umd.js.map

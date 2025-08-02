@@ -14533,7 +14533,7 @@ var LeafletContextMenu = (function () {
 	 */
 
 
-	let LeafletContextMenu$1 = class LeafletContextMenu extends L$1.Handler
+	class LeafletContextMenu extends L$1.Handler
 	{
 
 	    static BASE_CLS = 'leaflet-contextmenu';
@@ -14922,11 +14922,12 @@ var LeafletContextMenu = (function () {
 	    {
 	        layer.off('contextmenu');
 	    }
-	};
+	}
 
+	L.ContextMenu = LeafletContextMenu;
 	window.LeafletContextMenu = LeafletContextMenu;
 
-	return LeafletContextMenu$1;
+	return LeafletContextMenu;
 
 })();
 //# sourceMappingURL=leaflet.contextmenu.iife.js.map

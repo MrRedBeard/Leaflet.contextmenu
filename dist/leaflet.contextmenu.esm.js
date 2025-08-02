@@ -14530,7 +14530,7 @@ var L$1 = /*@__PURE__*/getDefaultExportFromCjs(leafletSrcExports);
  */
 
 
-let LeafletContextMenu$1 = class LeafletContextMenu extends L$1.Handler
+class LeafletContextMenu extends L$1.Handler
 {
 
     static BASE_CLS = 'leaflet-contextmenu';
@@ -14919,9 +14919,10 @@ let LeafletContextMenu$1 = class LeafletContextMenu extends L$1.Handler
     {
         layer.off('contextmenu');
     }
-};
+}
 
+L.ContextMenu = LeafletContextMenu;
 window.LeafletContextMenu = LeafletContextMenu;
 
-export { LeafletContextMenu$1 as default };
+export { LeafletContextMenu as default };
 //# sourceMappingURL=leaflet.contextmenu.esm.js.map
