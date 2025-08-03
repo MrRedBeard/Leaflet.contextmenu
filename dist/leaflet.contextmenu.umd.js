@@ -345,6 +345,8 @@
         _show(e)
         {
             this._showAtPoint(e.containerPoint, e);
+
+            this._map.fire('contextmenu.show');
         }
 
         _showAtPoint(point, data)

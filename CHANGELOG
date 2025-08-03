@@ -4,6 +4,7 @@
 * Functions being passed in were not firing
 * Set all menu items zindex above context menu
 * Context menu reset, hide, inherit bug fixed
+* _show: added ```this._map.fire('contextmenu.show');```
 
 # 1.6.0 (2025-08-02)
 * Added support for submenus 
