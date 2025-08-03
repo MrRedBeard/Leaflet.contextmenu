@@ -1,3 +1,10 @@
+# 1.6.1 (2025-08-03)
+* Fixes
+* Text/Link color
+* Functions being passed in were not firing
+* Set all menu items zindex above context menu
+* Context menu reset, hide, inherit bug fixed
+
 # 1.6.0 (2025-08-02)
 * Added support for submenus 
 * Rebuilt the build system using Vite and Rollup

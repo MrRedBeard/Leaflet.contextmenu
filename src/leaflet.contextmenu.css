@@ -1,8 +1,11 @@
 .leaflet-contextmenu, .leaflet-contextmenu-submenu, .leaflet-contextmenu-item, a.leaflet-contextmenu-item
 {
     color: #222 !important;
+    
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
 }
-
 
 .leaflet-contextmenu, .leaflet-contextmenu-submenu
 {
@@ -28,6 +31,8 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+
+    pointer-events: auto;
 }
 
 .leaflet-contextmenu
@@ -46,12 +51,11 @@
 
 .leaflet-contextmenu-submenu
 {
-  position: absolute;
-  left: 100%;
-  top: 0;
-  border-left: 2px solid #ddd;
-  z-index: 10001;
-  box-shadow: 2px 3px 1px rgba(0,0,0,0.1);
+    position: absolute;
+    left: 100%;
+    top: 0;
+    border-left: 2px solid #ddd;
+    box-shadow: 2px 3px 1px rgba(0,0,0,0.1);
 }
 
 .leaflet-contextmenu-separator
@@ -73,9 +77,9 @@
 
 .leaflet-contextmenu .leaflet-contextmenu-item
 {
-  position: relative;
-  padding: 4px 12px;
-  min-height: 1rem;
+    position: relative;
+    padding: 4px 12px;
+    min-height: 1rem;
 }
 
 .leaflet-contextmenu a.leaflet-contextmenu-item
@@ -89,6 +93,7 @@
     border-bottom: 1px solid transparent;
     cursor: default;
     outline: none;
+    z-index: 10001;
 }
 
 .leaflet-contextmenu-icon

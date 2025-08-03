@@ -1,4 +1,4 @@
-/*! LeafletContextMenu v1.6.0 */
+/*! LeafletContextMenu v1.6.1 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('leaflet')) :
     typeof define === 'function' && define.amd ? define(['leaflet'], factory) :
@@ -36,8 +36,18 @@
             //document.addEventListener('keydown', this._onKeyDown);
             L$1.DomEvent.on(container, 'keydown', () => this._onKeyDown);
 
+            //this._map.on('mousedown zoomstart', this._hide, this);
+            this._map.on('zoomstart', (e) =>
+            {
+                setTimeout(() =>
+                {
+                    this._hide();
+                }, 100);
+            }, this);
+
+            this._map.on('mousedown', this._hide, this);
+
             this._map.on('contextmenu', this._show, this);
-            this._map.on('mousedown zoomstart', this._hide, this);
         }
 
         removeHooks()
@@ -46,7 +56,14 @@
             container.removeEventListener('mouseleave', this._hide);
             document.removeEventListener('keydown', this._onKeyDown);
             this._map.off('contextmenu', this._show, this);
-            this._map.off('mousedown zoomstart', this._hide, this);
+            this._map.off('mousedown', this._hide, this);
+            this._map.off('zoomstart', (e) =>
+            {
+                setTimeout(() =>
+                {
+                    this._hide();
+                }, 100);
+            }, this);
         }
 
         showAt(latlng, data = {})
@@ -178,8 +195,9 @@
             container.style.zIndex = 10000;
             container.style.position = 'absolute';
             container.style.display = 'none';
-            container.addEventListener('click', L$1.DomEvent.stop);
-            container.addEventListener('contextmenu', L$1.DomEvent.stop);
+            // container.addEventListener('click', L.DomEvent.stop);
+            // L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);
+            // container.addEventListener('contextmenu', L.DomEvent.stop);
             return container;
         }
 
@@ -210,6 +228,7 @@
             }
 
             const el = this._insertElementAt('a', `${LeafletContextMenu.BASE_CLS}-item`, container, index);
+
             const iconHTML = options.icon
                 ? `<img src="${options.icon}" class="${LeafletContextMenu.BASE_CLS}-icon" />`
                 : options.iconCls
@@ -219,8 +238,13 @@
             el.innerHTML = `${iconHTML}${options.text}`;
             el.href = '#';
 
+            
+
             const callback = this._createEventHandler(el, options.callback, options.context);
-            el.addEventListener('click', callback);
+            el.addEventListener('click', (e) =>
+            {
+                callback(e);
+            });
 
             return {
                 id: L$1.Util.stamp(el),
@@ -254,6 +278,17 @@
             };
         }
 
+        _createEventHandler(el, callback, context)
+        {
+            return (e) =>
+            {
+                e.preventDefault();
+                e.stopPropagation();
+                if (callback) callback.call(context || this._map, e);
+                this._hide();
+            };
+        }
+
         _getIcon(options)
         {
             return L$1.Browser.retina && options.retinaIcon || options.icon;
@@ -274,9 +309,11 @@
         {
             const el = document.createElement(tag);
             el.className = className;
+
             const refEl = container.children[index];
             if (refEl) container.insertBefore(el, refEl);
             else container.appendChild(el);
+
             return el;
         }
 
@@ -305,16 +342,6 @@
             return size;
         }
 
-        _createEventHandler(el, callback, context)
-        {
-            return (e) =>
-            {
-                e.preventDefault();
-                if (callback) callback.call(context || this._map, e);
-                this._hide();
-            };
-        }
-
         _show(e)
         {
             this._showAtPoint(e.containerPoint, e);
@@ -322,6 +349,11 @@
 
         _showAtPoint(point, data)
         {
+            if (!data.relatedTarget)
+            {
+                this._hide();
+            }
+
             this._showLocation = { containerPoint: point, relatedTarget: data.relatedTarget };
             this._setPosition(point);
             this._container.style.display = 'block';
@@ -342,6 +374,10 @@
 
                 // Restore default items if they were hidden
                 this.showAllItems();
+
+                // Clear hover
+                const overEls = this._container.querySelectorAll('.over');
+                overEls.forEach(el => el.classList.remove('over'));
 
                 // Optional: trigger custom event for hooks
                 this._map.fire('contextmenu.hide');
@@ -383,8 +419,14 @@
                     .filter(item => !item.isDefault)
                     .forEach(item => map.contextmenu.removeItem(item.el));
 
-                // If not inheriting, hide all default items
-                if (!inherit) map.contextmenu.hideAllItems();
+                if (inherit)
+                {
+                    map.contextmenu.showAllItems();
+                }
+                else
+                {
+                    map.contextmenu.hideAllItems();
+                }
 
                 items.forEach(opt =>
                 {
