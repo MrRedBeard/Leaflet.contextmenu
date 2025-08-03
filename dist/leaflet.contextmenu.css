@@ -1,6 +1,12 @@
 /*
  * LeafletContextMenu v1.6.0
  */
+.leaflet-contextmenu, .leaflet-contextmenu-submenu, .leaflet-contextmenu-item, a.leaflet-contextmenu-item
+{
+    color: #222 !important;
+}
+
+
 .leaflet-contextmenu, .leaflet-contextmenu-submenu
 {
     display: none;
@@ -78,7 +84,6 @@
 .leaflet-contextmenu a.leaflet-contextmenu-item
 {
     display: block;
-    color: #222;
     font-size: 12px;
     line-height: 20px;
     text-decoration: none;
